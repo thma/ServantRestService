@@ -1,10 +1,9 @@
 {-# LANGUAGE DataKinds       #-}
 {-# LANGUAGE TypeOperators   #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric   #-}
 module Lib where
 
 import Data.Time.Calendar
---import Data.String.Conversions
 import Prelude.Compat
 
 import GHC.Generics
