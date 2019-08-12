@@ -22,6 +22,7 @@ library
                      , servant
                      , servant-docs
                      , servant-swagger
+                     , servant-swagger-ui
                      , string-conversions
                      , libiserv
                      , base-compat-batteries
