@@ -19,6 +19,9 @@ import           GHC.Generics
 import           Servant
 import           Servant.Swagger
 
+--import Network.Wai
+import Network.Wai.Handler.Warp
+
 todoAPI :: Proxy TodoAPI
 todoAPI = Proxy
 
@@ -68,6 +71,14 @@ todoSwagger = toSwagger todoAPI
 server :: Server API
 server = return todoSwagger :<|> error "not implemented"
 
+api :: Proxy API
+api = Proxy
+
 -- | Output generated @swagger.json@ file for the @'TodoAPI'@.
 writeSwaggerJSON :: IO ()
 writeSwaggerJSON = BL8.writeFile "example/swagger.json" (encodePretty todoSwagger)
+
+app :: Application
+app = serve api server
+
+startApp = run 8080 app

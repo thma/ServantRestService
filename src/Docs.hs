@@ -90,3 +90,5 @@ server = server3 :<|> Tagged serveDocs where
 
 app :: Application
 app = serve api server
+
+startApp = run 8080 app
