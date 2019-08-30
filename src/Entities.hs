@@ -15,25 +15,25 @@ data User = User {
 instance Entity User where
     getId = userId
 
-data Post = Post {
+data Posting = Posting {
       postId  :: Id
     , userRef :: Id
     , text    :: String
 } deriving (Show, Read, Generic, ToJSON, FromJSON)
 
-instance Entity Post where
+instance Entity Posting where
     getId = postId
 
 retrieveUser :: Id -> IO User
 retrieveUser = retrieve
 
-retrievePost :: Id -> IO Post
-retrievePost = retrieve
+retrievePosting :: Id -> IO Posting
+retrievePosting = retrieve
 
 -- little demo
 main = do
     let user = User "1" "Heinz Meier" "hm@meier.com"
-    let post = Post "4711" "1" "My name is Heinz, this is my first post"
+    let post = Posting "4711" "1" "My name is Heinz, this is my first post"
 
     persist user
     persist post
@@ -42,4 +42,4 @@ main = do
     user' <- retrieveUser "1"
     print user'
 
-    retrievePost "4711" >>= print
+    retrievePosting "4711" >>= print
