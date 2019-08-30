@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib, Docs, Todo, UiExample
+  exposed-modules:     Lib, Docs, Todo, UiExample, Entities, SimplePersistence, JsonPersistence
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , aeson-pretty
