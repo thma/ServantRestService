@@ -8,6 +8,8 @@ module JsonPersistence
     ) where
 import           Data.Aeson   (FromJSON, ToJSON, eitherDecodeFileStrict, encodeFile, toJSON)
 import           Data.Typeable
+import           System.Directory (listDirectory)
+import           Data.List
 
 -- | Identifier for an Entity
 type Id = String
@@ -36,6 +38,23 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
         case eitherEntity of
             Left msg -> fail msg
             Right e  -> return e
+
+
+    -- | load all persistent entities of type a
+    retrieveAll :: TypeRep -> IO [a]
+    retrieveAll tr = do
+        allFiles <- listDirectory ".stack-work/"
+        let filteredFiles = filter (isPrefixOf (show tr)) allFiles
+        return []
+{--        map 
+        -- compute file path based on entity type and entity id
+        let jsonFileName = getPath (typeRep ([] :: [a])) id
+        -- parse entity from JSON file
+        eitherEntity <- eitherDecodeFileStrict jsonFileName
+        case eitherEntity of
+            Left msg -> fail msg
+            Right e  -> return e
+--}
 
 -- | compute path of data file
 getPath :: TypeRep -> String -> String
