@@ -35,11 +35,7 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
         -- compute file path based on entity type and entity id
         let jsonFileName = getPath (typeRep ([] :: [a])) id
         -- parse entity from JSON file
-        eitherEntity <- eitherDecodeFileStrict jsonFileName
-        case eitherEntity of
-            Left msg -> fail msg
-            Right e  -> return e
-
+        decodeFile jsonFileName
 
     -- | load all persistent entities of type a
     retrieveAll :: IO [a]
@@ -47,11 +43,11 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
         let tr = typeRep ([] :: [a])
         allFiles <- listDirectory dataDir
         let filteredFiles = filter (\fname -> isPrefixOf (show tr) fname && isSuffixOf ".json" fname) allFiles 
-        mapM decodeFile filteredFiles 
+        mapM (\fname -> decodeFile (dataDir ++ fname)) filteredFiles 
 
 decodeFile :: FromJSON a => String -> IO a
 decodeFile jsonFileName= do     
-    eitherEntity <- eitherDecodeFileStrict (dataDir ++ jsonFileName)
+    eitherEntity <- eitherDecodeFileStrict jsonFileName
     case eitherEntity of
         Left msg -> fail msg
         Right e  -> return e

@@ -12,21 +12,22 @@ import Entities
 import JsonPersistence
 import Control.Monad.IO.Class 
 
-type UserAPI1 = "users" :> Get '[JSON] [User]
-        :<|> "users" :> Capture "id" Id :> Get '[JSON] User
-        :<|> "users" :> ReqBody '[JSON] User :> Post '[JSON] ()
+type UserAPI = 
+         "users" :> Get '[JSON] [User]
+    :<|> "users" :> Capture "id" Id :> Get '[JSON] User
+    :<|> "users" :> ReqBody '[JSON] User :> Post '[JSON] ()
 
 -- boilerplate to guide type inference
-userAPI1  :: Proxy UserAPI1
-userAPI1  = Proxy
+userAPI  :: Proxy UserAPI
+userAPI  = Proxy
 
-server1 :: Server UserAPI1
-server1 = 
+userServer :: Server UserAPI
+userServer = 
     -- GET /users
     getAllUsers
     -- GET /users/:id
     :<|>  getUser
-    -- POST /users/:id
+    -- POST /users
     :<|>  postUser
 
 getAllUsers :: Handler [User]
@@ -41,14 +42,17 @@ getUser id = do
 
 postUser :: User -> Handler ()
 postUser user = do
-    liftIO $ putStrLn $ "POST /users/" ++ show user
+    liftIO $ putStrLn $ "POST /users/ " ++ show user
     liftIO $ persist user
 
 -- 'serve' comes from servant and hands you a WAI Application,
 -- which you can think of as an "abstract" web application,
 -- not yet a webserver.
-app1 :: Application
-app1 = serve userAPI1 server1
+app :: Application
+app = serve userAPI userServer
 
 main :: IO ()
-main = run 8080 app1    
+main = do
+    let port = 8080
+    putStrLn $ "starting userAPI on port " ++ show port
+    run port app    

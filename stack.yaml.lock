@@ -3,7 +3,21 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: lzma-clib-5.2.2@sha256:25eb43d5fd8a8ab58380f475b91fb1fa907381f8a81c8d8ba63ba428d97ae0cc,4900
+    pantry-tree:
+      size: 11577
+      sha256: ed5ce184eaad3b4239f86d1d478d0b5ed6a93af5aac72f19f376c1690585576d
+  original:
+    hackage: lzma-clib-5.2.2
+- completed:
+    hackage: servant-swagger-ui-jensoleg-0.3.3@sha256:67bdb292985a96e5a1210967898a0145c2091b8d29ae1eadfe859fb65359f737,3377
+    pantry-tree:
+      size: 4027
+      sha256: 3cc07ae9dbbe32483eaf5cfedb0d91b3b326ae390bf523951bbb8402f76458ad
+  original:
+    hackage: servant-swagger-ui-jensoleg-0.3.3
 snapshots:
 - completed:
     size: 523443
