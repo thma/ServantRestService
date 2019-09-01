@@ -12,13 +12,6 @@ import Entities
 import JsonPersistence
 import Control.Monad.IO.Class 
 
-users1 :: [User]
-users1 = 
-    [ User "1" "Adam Antony" "adam@antony.com"
-    , User "2" "Bob Boulden" "bob@boulden.com"
-    , User "3" "Chris Carlson" "chris@carlson.com"
-    ]
-
 type UserAPI1 = "users" :> Get '[JSON] [User]
         :<|> "users" :> Capture "id" Id :> Get '[JSON] User
         :<|> "users" :> ReqBody '[JSON] User :> Post '[JSON] ()
@@ -30,15 +23,21 @@ userAPI1  = Proxy
 server1 :: Server UserAPI1
 server1 = 
     -- GET /users
-    return users1
+    getAllUsers
     -- GET /users/:id
     :<|>  getUser
     -- POST /users/:id
     :<|>  postUser
 
+getAllUsers :: Handler [User]
+getAllUsers = do
+    liftIO $ putStrLn "GET /users"
+    liftIO retrieveAll
 
 getUser :: Id -> Handler User
-getUser id = liftIO $ retrieve id
+getUser id = do
+    liftIO $ putStrLn $ "GET /users/" ++ id
+    liftIO $ retrieve id
 
 postUser :: User -> Handler ()
 postUser user = liftIO $ persist user

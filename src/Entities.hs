@@ -46,6 +46,5 @@ main = do
 
     retrievePosting "4711" >>= print
 
-    let tr = typeRep ([] :: [User])
-    all <- retrieveAll tr :: IO [User]
-    print all
+    allUsers <- retrieveAll :: IO [User]
+    print allUsers
