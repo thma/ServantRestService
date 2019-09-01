@@ -40,7 +40,9 @@ getUser id = do
     liftIO $ retrieve id
 
 postUser :: User -> Handler ()
-postUser user = liftIO $ persist user
+postUser user = do
+    liftIO $ putStrLn $ "POST /users/" ++ show user
+    liftIO $ persist user
 
 -- 'serve' comes from servant and hands you a WAI Application,
 -- which you can think of as an "abstract" web application,
