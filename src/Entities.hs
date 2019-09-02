@@ -5,7 +5,6 @@ module Entities where
 import           Data.Aeson   (FromJSON, ToJSON)
 import           GHC.Generics
 import           Data.Typeable
--- import SimplePersistence (Id, Entity, getId, persist, retrieve)
 import JsonPersistence (Id, Entity, getId, persist, retrieve, retrieveAll)
 
 data User = User {
