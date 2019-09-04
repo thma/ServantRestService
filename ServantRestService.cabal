@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Entities, SimplePersistence, JsonPersistence, EntityService, SwaggerEntityService 
+  exposed-modules:     Entities, JsonPersistence, EntityService, SwaggerEntityService, Lib
   -- Lib, Docs, Todo, UiExample, 
   build-depends:       base >= 4.7 && < 5
                      , aeson
@@ -24,8 +24,8 @@ library
                      , servant
                      , servant-docs
                      , servant-swagger
---                     , servant-swagger-ui
---                     , servant-swagger-ui-core
+                     , servant-swagger-ui
+                     , servant-swagger-ui-core
 --                     , servant-swagger-ui-redoc
 --                     , servant-swagger-ui-jensoleg >= 0.3.3
                      , swagger2

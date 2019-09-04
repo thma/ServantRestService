@@ -1,7 +1,6 @@
 module Main where
 
 import Lib
-import Docs
 
 main :: IO ()
-main = Docs.startApp
+main = Lib.startApp1
