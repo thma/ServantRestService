@@ -1,6 +1,6 @@
 module Main where
 
-import SwaggerEntityService
+import           SwaggerEntityService
 
 main :: IO ()
 main = SwaggerEntityService.up
