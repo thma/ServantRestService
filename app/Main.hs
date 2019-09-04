@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import SwaggerEntityService
 
 main :: IO ()
-main = Lib.startApp1
+main = SwaggerEntityService.up

@@ -15,16 +15,7 @@ import Servant
 import Control.Lens
 import Data.Aeson (toJSON)
 
--- | API for serving @swagger.json@.
-type SwaggerAPI = "swagger.json" :> Get '[JSON] Swagger
-
--- | Combined API of a User service with Swagger documentation.
-type API = SwaggerAPI :<|> UserAPI
-
--- boilerplate to guide type inference
-api :: Proxy API
-api = Proxy
-
+-- | Swagger spec of Model type 'User'
 instance ToSchema User where
     declareNamedSchema proxy = genericDeclareNamedSchema defaultSchemaOptions proxy
       & mapped.schema.description ?~ "This is the awesome User API (tm)"
@@ -33,42 +24,30 @@ instance ToSchema User where
 -- | Swagger spec for user API.
 swaggerDoc :: Swagger
 swaggerDoc = toSwagger userAPI
-    & host ?~ "127.0.0.1:8080" 
+    & host ?~ "localhost:8080" 
     & schemes ?~ [Http]
     & info.title   .~ "User API"
     & info.version .~ "1.23"
     & info.description ?~ "This is an API that tests swagger integration"
     & info.license ?~ ("APACHE 2.0" & url ?~ URL "http://apache.org")
 
--- | Combined server of a User service with Swagger documentation.
-server :: Server API
-server = return swaggerDoc :<|> userServer 
+-- | API type with bells and whistles, i.e. schema file and swagger-ui.
+type API = SwaggerSchemaUI "swagger-ui" "swagger.json" :<|> UserAPI
 
--- 'serve' comes from servant and hands you a WAI Application,
--- which you can think of as an "abstract" web application,
--- not yet a webserver.
+-- | boilerplate to guide type inference
+api :: Proxy API
+api = Proxy
+
+-- | Servant server for an API
+server :: Server API
+server = swaggerSchemaUIServer swaggerDoc
+       :<|> userServer
+
 app :: Application
 app = serve api server
 
--- | building up a swagger UI
--- | API type with bells and whistles, i.e. schema file and swagger-ui.
-type APIUI = SwaggerSchemaUI "swagger-ui" "swagger.json"
-        :<|> UserAPI
-
--- boilerplate to guide type inference
-apiUI :: Proxy APIUI
-apiUI = Proxy
-
--- | Servant server for an API
-serverUI :: Server APIUI
-serverUI = swaggerSchemaUIServer swaggerDoc
-       :<|> userServer
-
-appUI :: Application
-appUI = serve apiUI serverUI
-
-main :: IO ()
-main = do
+up :: IO ()
+up = do
     let port = 8080
     putStrLn $ "starting userAPI on port " ++ show port
-    run port appUI
+    run port app
