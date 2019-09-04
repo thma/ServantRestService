@@ -42,7 +42,7 @@ swaggerDoc = toSwagger userAPI
 
 -- | Combined server of a User service with Swagger documentation.
 server :: Server API
-server = return swaggerDoc :<|> userServer
+server = return swaggerDoc :<|> userServer 
 
 -- 'serve' comes from servant and hands you a WAI Application,
 -- which you can think of as an "abstract" web application,
