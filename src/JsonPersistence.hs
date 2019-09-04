@@ -1,16 +1,13 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-
 module JsonPersistence
-  ( Id
-  , Entity
-  , getId
-  , persist
-  , retrieve
-  , retrieveAll
-  ) where
-
-import           Data.Aeson       (FromJSON, ToJSON, eitherDecodeFileStrict,
-                                   encodeFile, toJSON)
+    ( Id
+    , Entity
+    , getId
+    , persist
+    , retrieve
+    , retrieveAll
+    ) where
+import           Data.Aeson       (FromJSON, ToJSON, eitherDecodeFileStrict, encodeFile, toJSON)
 import           Data.List
 import           Data.Typeable
 import           System.Directory (listDirectory)
@@ -19,41 +16,41 @@ import           System.Directory (listDirectory)
 type Id = String
 
 -- | The Entity type class provides generic persistence to JSON files
-class (ToJSON a, FromJSON a, Typeable a) =>
-      Entity a
+class (ToJSON a, FromJSON a, Typeable a) => Entity a where
+
     -- | return the unique Id of the entity. This function must be implemented by type class instances.
-  where
-  getId :: a -> Id
+    getId :: a -> Id
+
     -- | persist an entity of type a and identified by an Id to a json file
-  persist :: a -> IO ()
-  persist entity
+    persist :: a -> IO ()
+    persist entity = do
         -- compute file path based on runtime type and entity id
-   = do
-    let jsonFileName = getPath (typeRep ([] :: [a])) (getId entity)
+        let jsonFileName = getPath (typeRep ([] :: [a])) (getId entity)
         -- serialize entity as JSON and write to file
-    encodeFile jsonFileName entity
+        encodeFile jsonFileName entity
+
     -- | load persistent entity of type a and identified by an Id
-  retrieve :: Id -> IO a
-  retrieve id
+    retrieve :: Id -> IO a
+    retrieve id = do
         -- compute file path based on entity type and entity id
-   = do
-    let jsonFileName = getPath (typeRep ([] :: [a])) id
+        let jsonFileName = getPath (typeRep ([] :: [a])) id
         -- parse entity from JSON file
-    decodeFile jsonFileName
+        decodeFile jsonFileName
+
     -- | load all persistent entities of type a
-  retrieveAll :: IO [a]
-  retrieveAll = do
-    let tr = typeRep ([] :: [a])
-    allFiles <- listDirectory dataDir
-    let filteredFiles = filter (\fname -> isPrefixOf (show tr) fname && isSuffixOf ".json" fname) allFiles
-    mapM (\fname -> decodeFile (dataDir ++ fname)) filteredFiles
+    retrieveAll :: IO [a]
+    retrieveAll = do
+        let tr = typeRep ([] :: [a])
+        allFiles <- listDirectory dataDir
+        let filteredFiles = filter (\fname -> isPrefixOf (show tr) fname && isSuffixOf ".json" fname) allFiles
+        mapM (\fname -> decodeFile (dataDir ++ fname)) filteredFiles
 
 decodeFile :: FromJSON a => String -> IO a
-decodeFile jsonFileName = do
-  eitherEntity <- eitherDecodeFileStrict jsonFileName
-  case eitherEntity of
-    Left msg -> fail msg
-    Right e  -> return e
+decodeFile jsonFileName= do
+    eitherEntity <- eitherDecodeFileStrict jsonFileName
+    case eitherEntity of
+        Left msg -> fail msg
+        Right e  -> return e
 
 -- | compute path of data file
 getPath :: TypeRep -> String -> String

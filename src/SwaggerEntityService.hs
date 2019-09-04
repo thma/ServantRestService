@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
-
 module SwaggerEntityService where
 
 import           Control.Lens
@@ -17,25 +16,19 @@ import           Servant.Swagger.UI
 
 -- | Swagger spec of Model type 'User'
 instance ToSchema User where
-  declareNamedSchema proxy =
-    genericDeclareNamedSchema defaultSchemaOptions proxy & mapped . schema . description ?~
-    "This is the awesome User API (tm)" &
-    mapped .
-    schema .
-    example ?~
-    toJSON (User "4711" "Max Muster" "mm@muster.com")
+    declareNamedSchema proxy = genericDeclareNamedSchema defaultSchemaOptions proxy
+      & mapped.schema.description ?~ "This is the awesome User API (tm)"
+      & mapped.schema.example ?~ toJSON (User "4711" "Max Muster" "mm@muster.com" )
 
 -- | Swagger spec for user API.
 swaggerDoc :: Swagger
-swaggerDoc =
-  toSwagger userAPI & host ?~ "localhost:8080" & schemes ?~ [Http] & info . title .~ "User API" & info . version .~
-  "1.23" &
-  info .
-  description ?~
-  "This is an API that tests swagger integration" &
-  info .
-  license ?~
-  ("APACHE 2.0" & url ?~ URL "http://apache.org")
+swaggerDoc = toSwagger userAPI
+    & host    ?~ "localhost:8080"
+    & schemes ?~ [Http]
+    & info.title   .~ "User API"
+    & info.version .~ "1.23"
+    & info.description ?~ "This is an API that tests swagger integration"
+    & info.license     ?~ ("APACHE 2.0" & url ?~ URL "http://apache.org")
 
 -- | API type with bells and whistles, i.e. schema file and swagger-ui.
 type API = SwaggerSchemaUI "swagger-ui" "swagger.json" :<|> UserAPI
@@ -56,6 +49,6 @@ app = serve api server
 
 up :: IO ()
 up = do
-  let port = 8080
-  putStrLn $ "starting userAPI on port " ++ show port
-  run port app
+    let port = 8080
+    putStrLn $ "starting userAPI on port " ++ show port
+    run port app

@@ -8,27 +8,23 @@ import           GHC.Generics
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Servant
-
 import           Control.Monad.IO.Class
 import           Entities
 import           JsonPersistence
 
-type UserAPI
-   = "users" :> Get '[ JSON] [User] :<|> "users" :> Capture "id" Id :> Get '[ JSON] User :<|> "users" :> ReqBody '[ JSON] User :> Post '[ JSON] ()
+type UserAPI = "users" :> Get '[ JSON] [User]
+          :<|> "users" :> Capture "id" Id       :> Get  '[ JSON] User
+          :<|> "users" :> ReqBody '[ JSON] User :> Post '[ JSON] ()
 
 -- boilerplate to guide type inference
 userAPI :: Proxy UserAPI
 userAPI = Proxy
 
 userServer :: Server UserAPI
-userServer
-    -- GET /users
- =
-  getAllUsers
-    -- GET /users/:id
-   :<|>
-  getUser :<|>
-  postUser
+userServer =
+        getAllUsers   -- GET /users
+  :<|>  getUser       -- GET /users/{id}
+  :<|>  postUser      -- POST /users
 
 getAllUsers :: Handler [User]
 getAllUsers = do
