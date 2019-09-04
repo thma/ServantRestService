@@ -8,7 +8,6 @@ import Entities (User (..))
 import Data.Swagger
 import Servant.Swagger
 import Servant.Swagger.UI
-import Servant.Swagger.UI.Core -- the default implementation
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
@@ -24,12 +23,12 @@ instance ToSchema User where
 -- | Swagger spec for user API.
 swaggerDoc :: Swagger
 swaggerDoc = toSwagger userAPI
-    & host ?~ "localhost:8080" 
+    & host    ?~ "localhost:8080" 
     & schemes ?~ [Http]
     & info.title   .~ "User API"
     & info.version .~ "1.23"
     & info.description ?~ "This is an API that tests swagger integration"
-    & info.license ?~ ("APACHE 2.0" & url ?~ URL "http://apache.org")
+    & info.license     ?~ ("APACHE 2.0" & url ?~ URL "http://apache.org")
 
 -- | API type with bells and whistles, i.e. schema file and swagger-ui.
 type API = SwaggerSchemaUI "swagger-ui" "swagger.json" :<|> UserAPI
@@ -40,9 +39,11 @@ api = Proxy
 
 -- | Servant server for an API
 server :: Server API
-server = swaggerSchemaUIServer swaggerDoc
-       :<|> userServer
-
+server = swaggerSchemaUIServer swaggerDoc :<|> userServer
+       
+-- 'serve' comes from servant and hands you a WAI Application,
+-- which you can think of as an "abstract" web application,
+-- not yet a webserver.
 app :: Application
 app = serve api server
 
