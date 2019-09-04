@@ -7,6 +7,8 @@ import EntityService (UserAPI, userAPI, userServer)
 import Entities (User (..))
 import Data.Swagger
 import Servant.Swagger
+import Servant.Swagger.UI
+import Servant.Swagger.UI.Core -- the default implementation
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
@@ -29,8 +31,8 @@ instance ToSchema User where
       & mapped.schema.example ?~ toJSON (User "4711" "Max Muster" "mm@muster.com" )
 
 -- | Swagger spec for user API.
-swagger :: Swagger
-swagger = toSwagger userAPI
+swaggerDoc :: Swagger
+swaggerDoc = toSwagger userAPI
     & host ?~ "127.0.0.1:8080" 
     & schemes ?~ [Http]
     & info.title   .~ "User API"
@@ -40,7 +42,7 @@ swagger = toSwagger userAPI
 
 -- | Combined server of a User service with Swagger documentation.
 server :: Server API
-server = return swagger :<|> userServer
+server = return swaggerDoc :<|> userServer
 
 -- 'serve' comes from servant and hands you a WAI Application,
 -- which you can think of as an "abstract" web application,
@@ -48,8 +50,25 @@ server = return swagger :<|> userServer
 app :: Application
 app = serve api server
 
+-- | building up a swagger UI
+-- | API type with bells and whistles, i.e. schema file and swagger-ui.
+type APIUI = SwaggerSchemaUI "swagger-ui" "swagger.json"
+        :<|> UserAPI
+
+-- boilerplate to guide type inference
+apiUI :: Proxy APIUI
+apiUI = Proxy
+
+-- | Servant server for an API
+serverUI :: Server APIUI
+serverUI = swaggerSchemaUIServer swaggerDoc
+       :<|> userServer
+
+appUI :: Application
+appUI = serve apiUI serverUI
+
 main :: IO ()
 main = do
     let port = 8080
     putStrLn $ "starting userAPI on port " ++ show port
-    run port app
+    run port appUI
