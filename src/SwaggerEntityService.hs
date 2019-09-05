@@ -23,8 +23,8 @@ instance ToSchema User where
 -- | Swagger spec for user API.
 swaggerDoc :: Swagger
 swaggerDoc = toSwagger userAPI
-    & host    ?~ "localhost:8080"
-    & schemes ?~ [Http]
+--    & host    ?~ "localhost:8080"
+--    & schemes ?~ [Http]
     & info.title   .~ "User API"
     & info.version .~ "1.23"
     & info.description ?~ "This is an API that tests swagger integration"
@@ -50,5 +50,7 @@ app = serve api server
 up :: IO ()
 up = do
     let port = 8080
-    putStrLn $ "starting userAPI on port " ++ show port
+    putStrLn $ "GET all users: http://localhost:" ++ show port ++ "/users"
+    putStrLn $ "GET user 1:    http://localhost:" ++ show port ++ "/users/1"
+    putStrLn $ "Swagger UI:    http://localhost:" ++ show port ++ "/swagger-ui"
     run port app
