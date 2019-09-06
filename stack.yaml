@@ -32,15 +32,21 @@ resolver: lts-14.0
 #  subdirs:
 #  - auto-update
 #  - wai
+#packages:
+# - .
+# build against a local version of servant swagger ui:
+# - ../servant-swagger-ui/servant-swagger-ui
+# build against forked version of servant swagger ui:
 packages:
 - .
-# build against a local version of swagger ui:
-- ../servant-swagger-ui/servant-swagger-ui
+
 # Dependency packages to be pulled from upstream that are not in the resolver
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)
-extra-deps: [ lzma-clib-5.2.2
-            ]
+extra-deps:
+  - lzma-clib-5.2.2
+  - git: https://github.com/thma/servant-swagger-ui.git
+    commit: 4f536da6f5d6a36bcbcae6bfacc7a19078714c9a
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
