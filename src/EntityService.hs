@@ -1,5 +1,7 @@
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE UndecidableInstances       #-}
 
 module EntityService where
 
@@ -11,10 +13,14 @@ import           Servant
 import           Control.Monad.IO.Class
 import           Entities
 import           JsonPersistence
+import           Description (Desc)
 
-type UserAPI = "users" :> Get '[ JSON] [User]
-          :<|> "users" :> Capture "id" Id       :> Get  '[ JSON] User
-          :<|> "users" :> ReqBody '[ JSON] User :> Post '[ JSON] ()
+
+
+
+type UserAPI = "users" :> Summary "retrieve all users" :> Get '[ JSON] [User]
+          :<|> "users" :> Summary "retrieve one user"  :> Capture' '[Desc Id "unique identifier string"] ":id" Id :> Get  '[ JSON] User
+          :<|> "users" :> Summary "store a new user"   :> ReqBody '[ JSON] User :> Post '[ JSON] ()
 
 -- boilerplate to guide type inference
 userAPI :: Proxy UserAPI

@@ -17,7 +17,7 @@ import           Servant.Swagger.UI
 -- | Swagger spec of Model type 'User'
 instance ToSchema User where
     declareNamedSchema proxy = genericDeclareNamedSchema defaultSchemaOptions proxy
-      & mapped.schema.description ?~ "This is the awesome User API (tm)"
+      & mapped.schema.description ?~ "This is a User API (tm)"
       & mapped.schema.example ?~ toJSON (User "4711" "Max Muster" "mm@muster.com" )
 
 -- | Swagger spec for user API.
@@ -39,7 +39,10 @@ api = Proxy
 
 -- | Servant server for an API
 server :: Server API
-server = swaggerSchemaUIServer swaggerDoc :<|> userServer
+server = 
+  swaggerSchemaUIServer 
+  --redocSchemaUIServer
+    swaggerDoc :<|> userServer
 
 -- 'serve' comes from servant and hands you a WAI Application,
 -- which you can think of as an "abstract" web application,

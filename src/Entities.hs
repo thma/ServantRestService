@@ -3,7 +3,7 @@
 
 module Entities where
 import           Data.Aeson      (FromJSON, ToJSON)
-import           Data.Typeable
+--import           Data.Typeable
 import           GHC.Generics
 import           JsonPersistence (Entity, Id, getId, persist, retrieve, retrieveAll)
 

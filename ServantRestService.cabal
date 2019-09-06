@@ -25,6 +25,7 @@ library
                      , servant-swagger
                      , servant-swagger-ui
                      , servant-swagger-ui-core
+   --                  , servant-swagger-ui-redoc
                      , swagger2
                      , string-conversions
                      , libiserv
