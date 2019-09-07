@@ -1,13 +1,13 @@
 name:                ServantRestService
 version:             0.1.0.0
--- synopsis:
+synopsis:            Demo project for building REST APIs with Servant, exposing API docs via swagger-ui
 -- description:
 homepage:            https://github.com/githubuser/ServantRestService#readme
-license:             BSD3
+license:             APACHE
 license-file:        LICENSE
-author:              Author name here
-maintainer:          example@example.com
-copyright:           2019 Author name here
+author:              Thomas Mahler
+maintainer:          thma@apach.org
+copyright:           2019 Thomas Mahler
 category:            Web
 build-type:          Simple
 extra-source-files:  README.md
@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Entities, JsonPersistence, EntityService, SwaggerEntityService
+  exposed-modules:     Entities, JsonPersistence, EntityService, SwaggerEntityService, Description
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , aeson-pretty
@@ -25,7 +25,6 @@ library
                      , servant-swagger
                      , servant-swagger-ui
                      , servant-swagger-ui-core
-   --                  , servant-swagger-ui-redoc
                      , swagger2
                      , string-conversions
                      , libiserv
@@ -41,7 +40,7 @@ library
                      , directory
   default-language:    Haskell2010
 
-executable ServantRestService-exe
+executable ServantRestService
   hs-source-dirs:      app
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
@@ -64,4 +63,4 @@ test-suite ServantRestService-test
 
 source-repository head
   type:     git
-  location: https://github.com/githubuser/ServantRestService
+  location: https://github.com/thma/ServantRestService

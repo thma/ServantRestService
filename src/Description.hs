@@ -9,8 +9,8 @@ import GHC.Generics (D1, Meta (..), Rep)
 import GHC.TypeLits (AppendSymbol, Symbol)
 
 type family TypeName (x :: *) :: Symbol where
-    TypeName Int  = "Int"
-    TypeName String = "String"
+    TypeName Int  = "integer"
+    TypeName String = "string"
     TypeName x    = GenericTypeName x (Rep x ())
 
 type family GenericTypeName t (r :: *) :: Symbol where

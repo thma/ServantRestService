@@ -1,16 +1,19 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 module JsonPersistence
     ( Id
     , Entity
     , getId
     , persist
+    , put
     , retrieve
     , retrieveAll
+    , delete
     ) where
 import           Data.Aeson       (FromJSON, ToJSON, eitherDecodeFileStrict, encodeFile, toJSON)
-import           Data.List
-import           Data.Typeable
-import           System.Directory (listDirectory)
+import           Data.List hiding (delete)
+import           Data.Typeable (Typeable, TypeRep, typeRep)
+import           System.Directory (listDirectory, removeFile)
 
 -- | Identifier for an Entity
 type Id = String
@@ -29,6 +32,22 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
         -- serialize entity as JSON and write to file
         encodeFile jsonFileName entity
 
+    -- | persist an entity of type a and identified by an Id to a json file
+    put :: Id -> a -> IO ()
+    put id entity = do
+        -- compute file path based on runtime type and given id
+        let jsonFileName = getPath (typeRep ([] :: [a])) id
+        -- serialize entity as JSON and write to file
+        encodeFile jsonFileName entity
+
+    -- | delete an entity of type a and identified by an Id to a json file
+    delete :: a -> Id -> IO ()
+    delete entity id = do
+        -- compute file path based on runtime type and entity id
+        let jsonFileName = getPath (typeRep ([] :: [a])) id
+        -- remove file
+        removeFile jsonFileName
+
     -- | load persistent entity of type a and identified by an Id
     retrieve :: Id -> IO a
     retrieve id = do
@@ -38,12 +57,15 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
         decodeFile jsonFileName
 
     -- | load all persistent entities of type a
-    retrieveAll :: IO [a]
-    retrieveAll = do
+    retrieveAll :: Maybe Int -> IO [a]
+    retrieveAll maxRecords = do
         let tr = typeRep ([] :: [a])
         allFiles <- listDirectory dataDir
         let filteredFiles = filter (\fname -> isPrefixOf (show tr) fname && isSuffixOf ".json" fname) allFiles
-        mapM (\fname -> decodeFile (dataDir ++ fname)) filteredFiles
+        let files = case maxRecords of
+                      Nothing -> filteredFiles
+                      Just n  -> take n filteredFiles
+        mapM (\fname -> decodeFile (dataDir ++ fname)) files
 
 decodeFile :: FromJSON a => String -> IO a
 decodeFile jsonFileName= do

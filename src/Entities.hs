@@ -45,5 +45,5 @@ main = do
 
     retrievePosting "4711" >>= print
 
-    allUsers <- retrieveAll :: IO [User]
+    allUsers <- retrieveAll Nothing :: IO [User]
     print allUsers
