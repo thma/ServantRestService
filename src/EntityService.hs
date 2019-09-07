@@ -35,10 +35,6 @@ type UserAPI =
                :> Capture' '[Desc Id "unique identifier"] ":id" Id
                :> Delete '[ JSON] ()
 
--- | boilerplate to guide type inference
-userAPI :: Proxy UserAPI
-userAPI = Proxy
-
 -- | implements the UserAPI
 userServer :: Server UserAPI
 userServer =
@@ -73,6 +69,10 @@ deleteUser :: Id -> Handler ()
 deleteUser id = do
   liftIO $ putStrLn $ "DELETE /users/" ++ id
   liftIO $ delete (User "" "" "") id
+
+-- | boilerplate to guide type inference
+userAPI :: Proxy UserAPI
+userAPI = Proxy
 
 -- the following is not actually needed, it just exists for local testing
 -- 'serve' comes from servant and hands you a WAI Application,
