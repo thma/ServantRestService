@@ -12,7 +12,7 @@ module JsonPersistence
     ) where
 import           Data.Aeson       (FromJSON, ToJSON, eitherDecodeFileStrict, encodeFile, toJSON)
 import           Data.List hiding (delete)
-import           Data.Typeable (Typeable, TypeRep, typeRep)
+import           Data.Typeable (Typeable, TypeRep, typeRep, Proxy)
 import           System.Directory (listDirectory, removeFile)
 
 -- | Identifier for an Entity
@@ -41,10 +41,10 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
         encodeFile jsonFileName entity
 
     -- | delete an entity of type a and identified by an Id to a json file
-    delete :: a -> Id -> IO ()
-    delete entity id = do
+    delete :: Proxy a -> Id -> IO ()
+    delete proxy id = do
         -- compute file path based on runtime type and entity id
-        let jsonFileName = getPath (typeRep ([] :: [a])) id
+        let jsonFileName = getPath (typeRep proxy) id
         -- remove file
         removeFile jsonFileName
 

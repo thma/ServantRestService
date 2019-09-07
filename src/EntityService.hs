@@ -2,7 +2,6 @@
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE TypeOperators        #-}
 {-# LANGUAGE UndecidableInstances #-}
-
 module EntityService where
 
 import           Control.Monad.IO.Class
@@ -68,7 +67,10 @@ putUser id user = do
 deleteUser :: Id -> Handler ()
 deleteUser id = do
   liftIO $ putStrLn $ "DELETE /users/" ++ id
-  liftIO $ delete (User "" "" "") id
+  liftIO $ delete userType id
+  where
+    userType :: Proxy User
+    userType = Proxy
 
 -- | boilerplate to guide type inference
 userAPI :: Proxy UserAPI
