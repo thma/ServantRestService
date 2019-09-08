@@ -10,7 +10,9 @@ module JsonPersistence
     , retrieveAll
     , delete
     ) where
-import           Data.Aeson       (FromJSON, ToJSON, eitherDecodeFileStrict, encodeFile, toJSON)
+import           Data.Aeson       (FromJSON, ToJSON, 
+                                   eitherDecodeFileStrict, 
+                                   encodeFile, toJSON, decodeFileStrict)
 import           Data.List hiding (delete)
 import           Data.Typeable (Typeable, TypeRep, typeRep, Proxy)
 import           System.Directory (listDirectory, removeFile)
@@ -49,12 +51,13 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
         removeFile jsonFileName
 
     -- | load persistent entity of type a and identified by an Id
-    retrieve :: Id -> IO a
+    retrieve :: Id -> IO (Maybe a)
     retrieve id = do
         -- compute file path based on entity type and entity id
         let jsonFileName = getPath (typeRep ([] :: [a])) id
         -- parse entity from JSON file
-        decodeFile jsonFileName
+        decodeFileStrict jsonFileName
+
 
     -- | load all persistent entities of type a
     retrieveAll :: Maybe Int -> IO [a]

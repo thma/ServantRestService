@@ -6,7 +6,7 @@ homepage:            https://github.com/githubuser/ServantRestService#readme
 license:             APACHE
 license-file:        LICENSE
 author:              Thomas Mahler
-maintainer:          thma@apach.org
+maintainer:          thma@apache.org
 copyright:           2019 Thomas Mahler
 category:            Web
 build-type:          Simple

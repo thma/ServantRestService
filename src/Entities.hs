@@ -25,10 +25,10 @@ data Posting = Posting {
 instance Entity Posting where
     getId = postId
 
-retrieveUser :: Id -> IO User
+retrieveUser :: Id -> IO (Maybe User)
 retrieveUser = retrieve
 
-retrievePosting :: Id -> IO Posting
+retrievePosting :: Id -> IO (Maybe Posting)
 retrievePosting = retrieve
 
 -- little demo
@@ -39,7 +39,7 @@ main = do
     persist user
     persist post
 
-    user' <- retrieve "1" :: IO User
+    user' <- retrieve "1" :: IO (Maybe User)
     user' <- retrieveUser "1"
     print user'
 

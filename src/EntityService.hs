@@ -14,6 +14,7 @@ import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Servant
 import           Data.Typeable (typeRep)
+import Data.Maybe (fromMaybe)
 
 -- | REST api for User Entities
 type UserAPI =
@@ -52,7 +53,12 @@ getAllUsers max = do
 getUser :: Id -> Handler User
 getUser id = do
   liftIO $ putStrLn $ "GET /users/" ++ id
-  liftIO $ retrieve id
+  --fromMaybe (throwError err404) (liftIO $ retrieve id)
+  mayBeUser <- liftIO $ retrieve id -- :: Handler (Maybe User)
+  case mayBeUser of
+    Nothing   -> throwError err404
+    Just user -> return user
+  --return (User "" "" "")
 
 postUser :: User -> Handler ()
 postUser user = do
@@ -69,8 +75,7 @@ deleteUser id = do
   liftIO $ putStrLn $ "DELETE /users/" ++ id
   liftIO $ delete userType id
   where
-    userType :: Proxy User
-    userType = Proxy
+    userType = Proxy :: Proxy User
 
 -- | boilerplate to guide type inference
 userAPI :: Proxy UserAPI
