@@ -1,8 +1,10 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE Strict #-}
 module JsonPersistence
     ( Id
     , Entity
+    , PersistenceException (..)
     , getId
     , persist
     , put
@@ -16,9 +18,20 @@ import           Data.Aeson       (FromJSON, ToJSON,
 import           Data.List hiding (delete)
 import           Data.Typeable (Typeable, TypeRep, typeRep, Proxy)
 import           System.Directory (listDirectory, removeFile)
+import           Control.Exception 
+import           System.Directory (doesFileExist)
 
 -- | Identifier for an Entity
 type Id = String
+
+-- | exeption that may occur during persistence operations
+data PersistenceException = 
+    EntityNotFound
+  | EntityAlreadyExists
+  | InternalError
+  deriving (Show)
+
+instance Exception PersistenceException
 
 -- | The Entity type class provides generic persistence to JSON files
 class (ToJSON a, FromJSON a, Typeable a) => Entity a where
@@ -51,14 +64,13 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
         removeFile jsonFileName
 
     -- | load persistent entity of type a and identified by an Id
-    retrieve :: Id -> IO (Maybe a)
+    retrieve :: Id -> IO a
     retrieve id = do
         -- compute file path based on entity type and entity id
         let jsonFileName = getPath (typeRep ([] :: [a])) id
         -- parse entity from JSON file
-        decodeFileStrict jsonFileName
-
-
+        decodeFile jsonFileName    
+        
     -- | load all persistent entities of type a
     retrieveAll :: Maybe Int -> IO [a]
     retrieveAll maxRecords = do
@@ -72,10 +84,17 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
 
 decodeFile :: FromJSON a => String -> IO a
 decodeFile jsonFileName= do
-    eitherEntity <- eitherDecodeFileStrict jsonFileName
-    case eitherEntity of
-        Left msg -> fail msg
-        Right e  -> return e
+  fileExists <- doesFileExist jsonFileName
+  if fileExists
+    then do
+      eitherEntity <- eitherDecodeFileStrict jsonFileName
+      case eitherEntity of
+              Left msg -> throw InternalError
+              Right e  -> return e
+    else throw EntityNotFound
+
+    
+    
 
 -- | compute path of data file
 getPath :: TypeRep -> String -> String

@@ -2,9 +2,11 @@
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE TypeOperators        #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE OverloadedStrings    #-}
 module EntityService where
 
 import           Control.Monad.IO.Class
+import           Control.Exception hiding (Handler)
 import           Data.Aeson
 import           Description              (Desc)
 import           Entities
@@ -53,12 +55,15 @@ getAllUsers max = do
 getUser :: Id -> Handler User
 getUser id = do
   liftIO $ putStrLn $ "GET /users/" ++ id
-  --fromMaybe (throwError err404) (liftIO $ retrieve id)
-  mayBeUser <- liftIO $ retrieve id -- :: Handler (Maybe User)
-  case mayBeUser of
-    Nothing   -> throwError err404
-    Just user -> return user
-  --return (User "" "" "")
+  eitherUserEx <- liftIO $ try (retrieve id) :: Handler (Either PersistenceException User)
+  case eitherUserEx of
+    Left ex -> throwError $ mapToServerError ex
+    Right u -> return u
+
+mapToServerError :: PersistenceException -> ServerError
+mapToServerError EntityNotFound      = err404 {errBody = "nothing here"}
+mapToServerError InternalError       = err500
+mapToServerError EntityAlreadyExists = err409
 
 postUser :: User -> Handler ()
 postUser user = do
