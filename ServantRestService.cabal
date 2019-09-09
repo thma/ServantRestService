@@ -26,6 +26,7 @@ library
                      , servant-swagger-ui
                      , servant-swagger-ui-core
                      , swagger2
+                     , servant-exceptions
                      , string-conversions
                      , libiserv
                      , base-compat-batteries

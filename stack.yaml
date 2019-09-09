@@ -42,6 +42,7 @@ packages:
 # (e.g., acme-missiles-0.3)
 extra-deps:
   - lzma-clib-5.2.2
+  - servant-exceptions-0.1.1
   # build against forked version of servant swagger ui:
   #- git: https://github.com/thma/servant-swagger-ui.git
   #  commit: 4f536da6f5d6a36bcbcae6bfacc7a19078714c9a
