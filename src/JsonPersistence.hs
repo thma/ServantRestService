@@ -38,7 +38,7 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
     -- | return the unique Id of the entity. This function must be implemented by type class instances.
     getId :: a -> Id
 
-    -- | persist an entity of type a and identified by an Id to a json file
+    -- | persist a new entity of type a and identified by an Id to a json file
     post :: a -> IO ()
     post entity = do
         -- compute file path based on runtime type and entity id
@@ -48,24 +48,26 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
           then throw $ EntityAlreadyExists ("entity record already exists: " ++ jsonFileName)
           else encodeFile jsonFileName entity     -- serialize entity as JSON and write to file
 
-    -- | persist an entity of type a and identified by an Id to a json file
+    -- | update an entity of type a and identified by an Id to a json file
     put :: Id -> a -> IO ()
     put id entity = do
         -- compute file path based on runtime type and given id
         let jsonFileName = getPath (typeRep ([] :: [a])) id
         fileExists <- doesFileExist jsonFileName
+        if fileExists
+          then encodeFile jsonFileName entity     -- serialize entity as JSON and write to file
+          else throw $ EntityNotFound ("could not update as entity was not found: " ++ jsonFileName)
 
-          
-        -- serialize entity as JSON and write to file
-        encodeFile jsonFileName entity
 
     -- | delete an entity of type a and identified by an Id to a json file
     delete :: Proxy a -> Id -> IO ()
     delete proxy id = do
         -- compute file path based on runtime type and entity id
         let jsonFileName = getPath (typeRep proxy) id
-        -- remove file
-        removeFile jsonFileName
+        fileExists <- doesFileExist jsonFileName
+        if fileExists
+          then removeFile jsonFileName
+          else throw $ EntityNotFound ("could not delete as entity was not found: " ++ jsonFileName)
 
     -- | load persistent entity of type a and identified by an Id
     retrieve :: Id -> IO a
@@ -98,8 +100,6 @@ decodeFile jsonFileName= do
     else throw (EntityNotFound $ "could not find: " ++ jsonFileName)
 
     
-    
-
 -- | compute path of data file
 getPath :: TypeRep -> String -> String
 getPath tr id = dataDir ++ show tr ++ "." ++ id ++ ".json"

@@ -87,7 +87,10 @@ putUser id user = do
 deleteUser :: Id -> Handler ()
 deleteUser id = do
   liftIO $ putStrLn $ "DELETE /users/" ++ id
-  liftIO $ delete userType id
+  eitherVoidEx <- liftIO $ try (delete userType id) :: Handler (Either PersistenceException ())
+  case eitherVoidEx of
+    Left ex -> throwAsServerError ex
+    Right v -> return v
   where
     userType = Proxy :: Proxy User
 
