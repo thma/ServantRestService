@@ -1,12 +1,12 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE Strict #-}
+{-# LANGUAGE Strict              #-}
 module JsonPersistence
     ( Id
     , Entity
     , PersistenceException (..)
     , getId
-    , persist
+    , post
     , put
     , retrieve
     , retrieveAll
@@ -17,18 +17,17 @@ import           Data.Aeson       (FromJSON, ToJSON,
                                    encodeFile, toJSON, decodeFileStrict)
 import           Data.List hiding (delete)
 import           Data.Typeable (Typeable, TypeRep, typeRep, Proxy)
-import           System.Directory (listDirectory, removeFile)
+import           System.Directory (listDirectory, removeFile, doesFileExist)
 import           Control.Exception 
-import           System.Directory (doesFileExist)
 
 -- | Identifier for an Entity
 type Id = String
 
 -- | exeption that may occur during persistence operations
 data PersistenceException = 
-    EntityNotFound
-  | EntityAlreadyExists
-  | InternalError
+    EntityNotFound String
+  | EntityAlreadyExists String
+  | InternalError String
   deriving (Show)
 
 instance Exception PersistenceException
@@ -40,18 +39,23 @@ class (ToJSON a, FromJSON a, Typeable a) => Entity a where
     getId :: a -> Id
 
     -- | persist an entity of type a and identified by an Id to a json file
-    persist :: a -> IO ()
-    persist entity = do
+    post :: a -> IO ()
+    post entity = do
         -- compute file path based on runtime type and entity id
         let jsonFileName = getPath (typeRep ([] :: [a])) (getId entity)
-        -- serialize entity as JSON and write to file
-        encodeFile jsonFileName entity
+        fileExists <- doesFileExist jsonFileName
+        if fileExists
+          then throw $ EntityAlreadyExists ("entity record already exists: " ++ jsonFileName)
+          else encodeFile jsonFileName entity     -- serialize entity as JSON and write to file
 
     -- | persist an entity of type a and identified by an Id to a json file
     put :: Id -> a -> IO ()
     put id entity = do
         -- compute file path based on runtime type and given id
         let jsonFileName = getPath (typeRep ([] :: [a])) id
+        fileExists <- doesFileExist jsonFileName
+
+          
         -- serialize entity as JSON and write to file
         encodeFile jsonFileName entity
 
@@ -89,9 +93,9 @@ decodeFile jsonFileName= do
     then do
       eitherEntity <- eitherDecodeFileStrict jsonFileName
       case eitherEntity of
-              Left msg -> throw InternalError
+              Left msg -> throw (InternalError $ "could not parse data: " ++ msg)
               Right e  -> return e
-    else throw EntityNotFound
+    else throw (EntityNotFound $ "could not find: " ++ jsonFileName)
 
     
     

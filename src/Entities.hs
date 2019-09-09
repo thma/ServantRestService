@@ -5,7 +5,7 @@ module Entities where
 import           Data.Aeson      (FromJSON, ToJSON)
 --import           Data.Typeable
 import           GHC.Generics
-import           JsonPersistence (Entity, Id, getId, persist, retrieve, retrieveAll)
+import           JsonPersistence (Entity, Id, getId, post, retrieve, retrieveAll)
 
 data User = User {
       userId :: Id
@@ -34,10 +34,10 @@ retrievePosting = retrieve
 -- little demo
 main = do
     let user = User "1" "Heinz Meier" "hm@meier.com"
-    let post = Posting "4711" "1" "My name is Heinz, this is my first post"
+    let posting = Posting "4711" "1" "My name is Heinz, this is my first post"
 
-    persist user
-    persist post
+    post user
+    post posting
 
     user' <- retrieve "1" :: IO User
     user' <- retrieveUser "1"
