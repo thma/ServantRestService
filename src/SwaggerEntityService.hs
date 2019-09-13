@@ -13,6 +13,7 @@ import           Network.Wai.Handler.Warp
 import           Servant
 import           Servant.Swagger
 import           Servant.Swagger.UI
+import           System.Process           (createProcess, shell)
 
 -- | Swagger spec of Model type 'User'
 instance ToSchema User where
@@ -56,4 +57,6 @@ up = do
     putStrLn $ "GET all users: http://localhost:" ++ show port ++ "/users"
     putStrLn $ "GET user 1:    http://localhost:" ++ show port ++ "/users/1"
     putStrLn $ "Swagger UI:    http://localhost:" ++ show port ++ "/swagger-ui"
+    -- the next line works only on windows: open a browser on the swagger UI 
+    r <- createProcess  (shell ("start http://localhost:" ++ show port ++ "/swagger-ui"))
     run port app
