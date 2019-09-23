@@ -18,12 +18,12 @@ import           Data.Aeson       (FromJSON, ToJSON,
 import           Data.List hiding (delete)
 import           Data.Typeable (Typeable, TypeRep, typeRep, Proxy)
 import           System.Directory (listDirectory, removeFile, doesFileExist)
-import           Control.Exception 
+import           Control.Exception
 
 -- | Identifier for an Entity
 type Id = String
 
--- | exeption that may occur during persistence operations
+-- | exeptions that may occur during persistence operations
 data PersistenceException = 
     EntityNotFound String
   | EntityAlreadyExists String
@@ -31,6 +31,8 @@ data PersistenceException =
   deriving (Show)
 
 instance Exception PersistenceException
+
+
 
 -- | The Entity type class provides generic persistence to JSON files
 class (ToJSON a, FromJSON a, Typeable a) => Entity a where

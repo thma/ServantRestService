@@ -20,10 +20,12 @@ import           JsonPersistence
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Servant
-
+import Servant.Exception (Throws, ToServantErr, status)
+import Network.HTTP.Types.Status (status404, status409, status500)
+import Control.Monad.Catch.Pure (MonadCatch, MonadThrow)
 
 -- | REST api for User Entities
-type UserAPI =
+type UserAPI = --Throws PersistenceException :>
        "users" :> Summary "retrieve all users"
                :> QueryParam' '[Optional, Desc Int "max number of records to load"] "maxRecords" Int
                :> Get '[ JSON] [User]
@@ -43,6 +45,7 @@ type UserAPI =
 
 -- | implements the UserAPI
 userServer :: Server UserAPI
+--userServer :: MonadCatch m => ServerT UserAPI m
 userServer =
         getAllUsers   -- GET /users
   :<|>  getUser       -- GET /users/{id}
@@ -51,6 +54,7 @@ userServer =
   :<|>  deleteUser    -- DELETE /users/{id}
 
 -- | handler functions
+--getAllUsers :: MonadThrow m => Maybe Int -> m [User] 
 getAllUsers :: Maybe Int -> Handler [User]
 getAllUsers max = do
   liftIO $ putStrLn "GET /users"
@@ -74,7 +78,6 @@ postUser user = do
   case eitherVoidEx of
     Left ex -> throwAsServerError ex
     Right v -> return v
-
 
 putUser :: Id -> User -> Handler ()
 putUser id user = do
@@ -104,6 +107,10 @@ throwAsServerError ex =
       EntityAlreadyExists msg -> err409 {errBody = pack msg}
       InternalError msg       -> err500 {errBody = pack msg}
 
+instance ToServantErr PersistenceException where
+  status (EntityNotFound msg)      = status404
+  status (EntityAlreadyExists msg) = status409
+  status (InternalError msg)       = status500
 
 -- | boilerplate to guide type inference
 userAPI :: Proxy UserAPI

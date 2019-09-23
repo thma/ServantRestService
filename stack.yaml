@@ -17,7 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: lts-14.0
+resolver: lts-14.5
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -42,7 +42,7 @@ packages:
 # (e.g., acme-missiles-0.3)
 extra-deps:
   - lzma-clib-5.2.2
-  - servant-exceptions-0.1.1
+#  - servant-exceptions-0.1.0
   # build against forked version of servant swagger ui:
   #- git: https://github.com/thma/servant-swagger-ui.git
   #  commit: 4f536da6f5d6a36bcbcae6bfacc7a19078714c9a

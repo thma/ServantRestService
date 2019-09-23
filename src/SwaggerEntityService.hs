@@ -13,7 +13,9 @@ import           Network.Wai.Handler.Warp
 import           Servant
 import           Servant.Swagger
 import           Servant.Swagger.UI
-import           System.Process           (createProcess, shell)
+import           System.Process           (createProcess, shell, ProcessHandle)
+import           GHC.IO.Handle.Types      (Handle)
+import           System.Info              (os)
 
 -- | Swagger spec of Model type 'User'
 instance ToSchema User where
@@ -24,8 +26,6 @@ instance ToSchema User where
 -- | Swagger spec for user API.
 swaggerDoc :: Swagger
 swaggerDoc = toSwagger userAPI
---    & host    ?~ "localhost:8080"
---    & schemes ?~ [Http]
     & info.title   .~ "User API"
     & info.version .~ "1.23"
     & info.description ?~ "This is an API that tests swagger integration"
@@ -42,21 +42,31 @@ api = Proxy
 server :: Server API
 server = 
   swaggerSchemaUIServer 
-  --redocSchemaUIServer
     swaggerDoc :<|> userServer
 
--- 'serve' comes from servant and hands you a WAI Application,
+-- | 'serve' comes from servant and hands you a WAI Application,
 -- which you can think of as an "abstract" web application,
 -- not yet a webserver.
 app :: Application
 app = serve api server
 
+-- | start up server and launch browser on swagger UI
 up :: IO ()
 up = do
-    let port = 8080
-    putStrLn $ "GET all users: http://localhost:" ++ show port ++ "/users"
-    putStrLn $ "GET user 1:    http://localhost:" ++ show port ++ "/users/1"
-    putStrLn $ "Swagger UI:    http://localhost:" ++ show port ++ "/swagger-ui"
-    -- the next line works only on windows: open a browser on the swagger UI 
-    r <- createProcess  (shell ("start http://localhost:" ++ show port ++ "/swagger-ui"))
-    run port app
+  let port = 8080
+  putStrLn $ "GET all users: http://localhost:" ++ show port ++ "/users"
+  putStrLn $ "GET user 1:    http://localhost:" ++ show port ++ "/users/1"
+  putStrLn $ "Swagger UI:    http://localhost:" ++ show port ++ "/swagger-ui"
+  launchSiteInBrowser port
+  run port app
+
+
+-- | convenience function that opens the swagger UI in the default web browser
+launchSiteInBrowser:: Int -> IO (Maybe Handle, Maybe Handle, Maybe Handle, ProcessHandle)
+launchSiteInBrowser port =
+  case os of
+    "mingw32" -> createProcess  (shell $ "start "    ++ url)
+    "darwin"  -> createProcess  (shell $ "open "     ++ url)
+    _         -> createProcess  (shell $ "xdg-open " ++ url)
+  where 
+    url = "http://localhost:" ++ show port ++ "/swagger-ui"

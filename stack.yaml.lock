@@ -11,16 +11,9 @@ packages:
       sha256: ed5ce184eaad3b4239f86d1d478d0b5ed6a93af5aac72f19f376c1690585576d
   original:
     hackage: lzma-clib-5.2.2
-- completed:
-    hackage: servant-swagger-ui-jensoleg-0.3.3@sha256:67bdb292985a96e5a1210967898a0145c2091b8d29ae1eadfe859fb65359f737,3377
-    pantry-tree:
-      size: 4027
-      sha256: 3cc07ae9dbbe32483eaf5cfedb0d91b3b326ae390bf523951bbb8402f76458ad
-  original:
-    hackage: servant-swagger-ui-jensoleg-0.3.3
 snapshots:
 - completed:
-    size: 523443
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/14/0.yaml
-    sha256: 283773e7120f5446d961eab35ea95c9af9c24187cc178537bd29273200a05171
-  original: lts-14.0
+    size: 524104
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/14/5.yaml
+    sha256: 3c146eebc1b383211ea49d5422fb3d63d699da12307b4bc989107300eb579d60
+  original: lts-14.5
